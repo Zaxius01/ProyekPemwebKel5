@@ -1,6 +1,7 @@
 <?php
 $rooms = [
     [
+        'id' => 1,
         'name' => 'Arunika Garden Suite',
         'type' => 'SUITE · PEMANDANGAN TAMAN',
         'price' => '1.850.000',
@@ -10,6 +11,7 @@ $rooms = [
         'icon' => 'bi-flower1',
     ],
     [
+        'id' => 2,
         'name' => 'Serenity Ocean Room',
         'type' => 'DELUXE · PEMANDANGAN LAUT',
         'price' => '2.450.000',
@@ -19,6 +21,7 @@ $rooms = [
         'icon' => 'bi-water',
     ],
     [
+        'id' => 3,
         'name' => 'The Arunika Residence',
         'type' => 'VILLA · PRIVATE POOL',
         'price' => '4.200.000',
@@ -102,7 +105,7 @@ $rooms = [
                     <?php foreach ($rooms as $room): ?>
                         <div class="col-md-6 col-lg-4">
                             <article class="room-card">
-                                <a class="room-image-wrap" href="room-detail.php" aria-label="Lihat <?= htmlspecialchars($room['name'], ENT_QUOTES, 'UTF-8') ?>">
+                                <a class="room-image-wrap" href="room-detail.php?id=<?= $room['id'] ?>" aria-label="Lihat <?= htmlspecialchars($room['name'], ENT_QUOTES, 'UTF-8') ?>">
                                     <img src="<?= htmlspecialchars($room['image'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($room['alt'], ENT_QUOTES, 'UTF-8') ?>" loading="lazy">
                                     <span class="room-tag">PILIHAN ARUNIKA</span>
                                 </a>
@@ -119,7 +122,7 @@ $rooms = [
                                     </div>
                                     <div class="room-card-bottom">
                                         <p><strong>Rp <?= htmlspecialchars($room['price'], ENT_QUOTES, 'UTF-8') ?></strong> <span>/ malam</span></p>
-                                        <a href="room-detail.php" aria-label="Pesan <?= htmlspecialchars($room['name'], ENT_QUOTES, 'UTF-8') ?>"><i class="bi bi-arrow-up-right"></i></a>
+                                        <a href="room-detail.php?id=<?= $room['id'] ?>" aria-label="Pesan <?= htmlspecialchars($room['name'], ENT_QUOTES, 'UTF-8') ?>"><i class="bi bi-arrow-up-right"></i></a>
                                     </div>
                                 </div>
                             </article>

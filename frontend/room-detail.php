@@ -1,13 +1,13 @@
 <?php
 $rooms = [
     1 => [
-        'name' => 'Standard Room',
-        'type' => 'STANDARD ROOM',
-        'price' => 950000,
+        'name' => 'Arunika Garden Suite',
+        'type' => 'SUITE · PEMANDANGAN TAMAN',
+        'price' => 1850000,
         'capacity' => 2,
         'beds' => '1 Queen Bed',
         'size' => '28 m²',
-        'description' => 'Nikmati suasana tenang di Standard Room, ruang nyaman dengan sentuhan material alami dan pencahayaan hangat. Tata ruang yang efisien, tempat tidur berkualitas, serta fasilitas modern menjadikannya pilihan tepat untuk beristirahat dan memulai hari baru di Bali.',
+        'description' => 'Nikmati suasana tenang di Arunika Garden Suite, ruang nyaman dengan sentuhan material alami dan pencahayaan hangat. Tata ruang yang efisien, tempat tidur berkualitas, serta fasilitas modern menjadikannya pilihan tepat untuk beristirahat dan memulai hari baru di Bali.',
         'image' => 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=1400&q=85',
         'gallery' => [
             ['image' => 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1000&q=85', 'alt' => 'Detail tempat tidur dan pencahayaan kamar'],
@@ -17,13 +17,13 @@ $rooms = [
         'facilities' => ['Wi-Fi berkecepatan tinggi', 'AC dengan kontrol individual', 'Smart TV', 'Brankas pribadi', 'Kamar mandi dengan shower', 'Perlengkapan mandi', 'Air mineral harian', 'Sarapan untuk 2 tamu'],
     ],
     2 => [
-        'name' => 'Deluxe Room',
-        'type' => 'DELUXE ROOM',
-        'price' => 1450000,
+        'name' => 'Serenity Ocean Room',
+        'type' => 'DELUXE · PEMANDANGAN LAUT',
+        'price' => 2450000,
         'capacity' => 2,
         'beds' => '1 King Bed',
         'size' => '36 m²',
-        'description' => 'Deluxe Room memadukan ruang yang lebih lapang dengan detail kontemporer dan suasana yang menenangkan. Nikmati balkon pribadi, kamar mandi dengan bathtub, dan tempat tidur king yang dirancang untuk membuat setiap waktu istirahat terasa istimewa.',
+        'description' => 'Serenity Ocean Room memadukan ruang yang lebih lapang dengan detail kontemporer dan suasana yang menenangkan. Nikmati balkon pribadi, kamar mandi dengan bathtub, dan tempat tidur king yang dirancang untuk membuat setiap waktu istirahat terasa istimewa.',
         'image' => 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1400&q=85',
         'gallery' => [
             ['image' => 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=1000&q=85', 'alt' => 'Detail tempat tidur dan pencahayaan kamar'],
@@ -33,16 +33,16 @@ $rooms = [
         'facilities' => ['Wi-Fi berkecepatan tinggi', 'AC dengan kontrol individual', 'Smart TV', 'Balkon pribadi', 'Bathtub dan shower', 'Perlengkapan mandi premium', 'Brankas pribadi', 'Sarapan untuk 2 tamu'],
     ],
     3 => [
-        'name' => 'Superior Room',
-        'type' => 'SUPERIOR ROOM',
-        'price' => 1250000,
+        'name' => 'The Arunika Residence',
+        'type' => 'VILLA · PRIVATE POOL',
+        'price' => 4200000,
         'capacity' => 2,
         'beds' => '1 King Bed',
         'size' => '32 m²',
-        'description' => 'Superior Room menghadirkan suasana yang lapang dengan pemandangan taman tropis yang asri. Desain kontemporer, area lounge yang nyaman, dan fasilitas pilihan memberi Anda ruang untuk beristirahat dengan lebih leluasa.',
+        'description' => 'The Arunika Residence menghadirkan suasana yang lapang dengan pemandangan taman tropis yang asri. Desain kontemporer, area lounge yang nyaman, dan fasilitas pilihan memberi Anda ruang untuk beristirahat dengan lebih leluasa.',
         'image' => 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1400&q=85',
         'gallery' => [
-            ['image' => 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1000&q=85', 'alt' => 'Interior Superior Room bernuansa alami'],
+            ['image' => 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1000&q=85', 'alt' => 'Interior The Arunika Residence bernuansa alami'],
             ['image' => 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1000&q=85', 'alt' => 'Area lounge di dalam kamar'],
             ['image' => 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=1000&q=85', 'alt' => 'Tempat tidur king yang nyaman'],
         ],
@@ -322,6 +322,7 @@ if ($room !== null) {
                             <aside class="booking-card" aria-label="Form pemesanan kamar">
                                 <p class="booking-card-label">Harga mulai dari</p>
                                 <p class="booking-card-price">Rp <?= number_format($room['price'], 0, ',', '.') ?> <span>/ malam</span></p>
+                                <p class="small text-muted mb-3">Check-in pukul <strong>14.00 WITA</strong><br>Check-out pukul <strong>12.00 WITA</strong></p>
 
                                 <?php if ($errors): ?>
                                     <div class="detail-errors" role="alert">

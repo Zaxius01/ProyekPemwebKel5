@@ -1,23 +1,24 @@
 <?php
+// Data kamar ini hanya untuk tampilan dan nantinya diganti dengan data dari backend.
 $rooms = [
     1 => [
-        'name' => 'Standard Room',
-        'type' => 'Standard Room',
-        'price' => 950000,
+        'name' => 'Arunika Garden Suite',
+        'type' => 'SUITE · PEMANDANGAN TAMAN',
+        'price' => 1850000,
         'capacity' => 2,
         'image' => 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=1000&q=85',
     ],
     2 => [
-        'name' => 'Deluxe Room',
-        'type' => 'Deluxe Room',
-        'price' => 1450000,
+        'name' => 'Serenity Ocean Room',
+        'type' => 'DELUXE · PEMANDANGAN LAUT',
+        'price' => 2450000,
         'capacity' => 2,
         'image' => 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1000&q=85',
     ],
     3 => [
-        'name' => 'Superior Room',
-        'type' => 'Superior Room',
-        'price' => 1250000,
+        'name' => 'The Arunika Residence',
+        'type' => 'VILLA · PRIVATE POOL',
+        'price' => 4200000,
         'capacity' => 2,
         'image' => 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1000&q=85',
     ],
@@ -44,100 +45,46 @@ $rooms = [
     ],
 ];
 
-$isPost = $_SERVER['REQUEST_METHOD'] === 'POST';
-$requestData = $isPost ? $_POST : $_GET;
-$rawRoomId = isset($requestData['room_id']) && is_string($requestData['room_id']) ? $requestData['room_id'] : '';
-$roomId = ctype_digit($rawRoomId) ? (int) $rawRoomId : 0;
+$roomId = isset($_POST['room_id']) ? (int) $_POST['room_id'] : 0;
+if ($roomId === 0 && isset($_GET['room_id'])) {
+    $roomId = (int) $_GET['room_id'];
+}
 $room = isset($rooms[$roomId]) ? $rooms[$roomId] : null;
 
-if ($room === null) {
-    http_response_code(404);
+$checkIn = '';
+if (isset($_POST['check_in'])) {
+    $checkIn = $_POST['check_in'];
+} elseif (isset($_GET['check_in'])) {
+    $checkIn = $_GET['check_in'];
 }
 
-$today = new DateTimeImmutable('today');
-$parseDate = static function ($value) {
-    if (!is_string($value) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
-        return null;
-    }
+$checkOut = '';
+if (isset($_POST['check_out'])) {
+    $checkOut = $_POST['check_out'];
+} elseif (isset($_GET['check_out'])) {
+    $checkOut = $_GET['check_out'];
+}
 
-    $date = DateTimeImmutable::createFromFormat('!Y-m-d', $value);
-    $errors = DateTimeImmutable::getLastErrors();
-    if (!$date || ($errors !== false && ($errors['warning_count'] > 0 || $errors['error_count'] > 0)) || $date->format('Y-m-d') !== $value) {
-        return null;
-    }
+$guestCount = 0;
+if (isset($_POST['guests'])) {
+    $guestCount = (int) $_POST['guests'];
+} elseif (isset($_GET['guests'])) {
+    $guestCount = (int) $_GET['guests'];
+}
 
-    return $date;
-};
-
-$checkIn = isset($requestData['check_in']) && is_string($requestData['check_in']) ? $requestData['check_in'] : '';
-$checkOut = isset($requestData['check_out']) && is_string($requestData['check_out']) ? $requestData['check_out'] : '';
-$rawGuests = isset($requestData['guests']) && is_string($requestData['guests']) ? $requestData['guests'] : '';
-$guestCount = ctype_digit($rawGuests) ? (int) $rawGuests : 0;
-$checkInDate = $parseDate($checkIn);
-$checkOutDate = $parseDate($checkOut);
-$changeBookingUrl = 'room-detail.php?' . http_build_query([
-    'id' => $roomId,
-    'check_in' => $checkIn,
-    'check_out' => $checkOut,
-    'guests' => $guestCount,
-]);
 $nights = 0;
-$totalPrice = 0;
-$errors = [];
-$confirmed = false;
-
-$fullName = $isPost && isset($_POST['full_name']) && is_string($_POST['full_name']) ? trim($_POST['full_name']) : '';
-$email = $isPost && isset($_POST['email']) && is_string($_POST['email']) ? trim($_POST['email']) : '';
-$phone = $isPost && isset($_POST['phone']) && is_string($_POST['phone']) ? trim($_POST['phone']) : '';
-$paymentMethod = $isPost && isset($_POST['payment_method']) && is_string($_POST['payment_method'])
-    ? $_POST['payment_method']
-    : 'bank_transfer';
-
-if ($room !== null) {
-    if ($checkInDate === null || $checkOutDate === null) {
-        $errors[] = 'Tanggal check-in dan check-out wajib diisi dengan tanggal yang valid.';
-    } elseif ($checkInDate < $today) {
-        $errors[] = 'Tanggal check-in tidak boleh sebelum hari ini.';
-    } elseif ($checkOutDate <= $checkInDate) {
-        $errors[] = 'Tanggal check-out harus setelah tanggal check-in.';
-    } else {
-        $nights = (int) $checkInDate->diff($checkOutDate)->days;
-        $totalPrice = $nights * $room['price'];
-    }
-
-    if ($guestCount < 1 || $guestCount > $room['capacity']) {
-        $errors[] = 'Jumlah tamu harus antara 1 dan ' . $room['capacity'] . ' orang untuk kamar ini.';
-        $guestCount = 0;
-    }
-
-    if ($isPost) {
-        $nameLength = preg_match_all('/./us', $fullName, $nameCharacters);
-        if ($fullName === '' || $nameLength === false || $nameLength > 120 || preg_match('/[\r\n]/', $fullName)) {
-            $errors[] = 'Masukkan nama lengkap yang valid (maksimal 120 karakter).';
-        }
-        if (strlen($email) > 254 || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $errors[] = 'Masukkan alamat email yang valid.';
-        }
-
-        $phoneDigits = preg_replace('/\D/', '', $phone);
-        if (!preg_match('/^\+?[0-9\s().-]{8,24}$/', $phone) || strlen($phoneDigits) < 8 || strlen($phoneDigits) > 15) {
-            $errors[] = 'Masukkan nomor telepon yang valid.';
-        }
-        if (!in_array($paymentMethod, ['bank_transfer', 'pay_at_hotel'], true)) {
-            $errors[] = 'Pilih metode pembayaran yang tersedia.';
-        }
-
-        if (!$errors) {
-            $confirmed = true;
-        } else {
-            http_response_code(422);
-        }
-    }
+$checkInTime = strtotime($checkIn);
+$checkOutTime = strtotime($checkOut);
+if ($checkInTime !== false && $checkOutTime !== false && $checkOutTime > $checkInTime) {
+    $nights = (int) (($checkOutTime - $checkInTime) / 86400);
 }
 
-$escape = static function ($value) {
-    return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
-};
+$totalPrice = $room !== null ? $nights * $room['price'] : 0;
+
+$fullName = isset($_POST['full_name']) ? $_POST['full_name'] : '';
+$email = isset($_POST['email']) ? $_POST['email'] : '';
+$phone = isset($_POST['phone']) ? $_POST['phone'] : '';
+$paymentMethod = isset($_POST['payment_method']) ? $_POST['payment_method'] : 'bank_transfer';
 ?>
 <!doctype html>
 <html lang="id">
@@ -145,7 +92,7 @@ $escape = static function ($value) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Lengkapi detail pemesanan kamar di Hotel Arunika.">
-    <title><?= $confirmed ? 'Pemesanan Dikonfirmasi' : 'Pemesanan Kamar' ?> — Hotel Arunika</title>
+    <title>Pemesanan Kamar — Hotel Arunika</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://images.unsplash.com">
@@ -244,28 +191,12 @@ $escape = static function ($value) {
         <header class="booking-hero">
             <div class="container booking-hero-content">
                 <p class="eyebrow">HOTEL ARUNIKA · BALI</p>
-                <h1><?= $confirmed ? 'Pemesanan Anda' : 'Selesaikan pemesanan.' ?></h1>
+                <h1>Selesaikan pemesanan.</h1>
             </div>
         </header>
 
         <main class="booking-page-main">
             <div class="container">
-                <?php if ($confirmed): ?>
-                    <section class="booking-success" aria-labelledby="booking-success-title">
-                        <span class="booking-success-icon"><i class="bi bi-check2" aria-hidden="true"></i></span>
-                        <h2 id="booking-success-title">Pemesanan berhasil dikonfirmasi</h2>
-                        <p>Data pemesanan demo Anda sudah tervalidasi. Informasi ini belum disimpan ke database.</p>
-                        <div class="booking-data-row"><span>Nama pemesan</span><strong><?= $escape($fullName) ?></strong></div>
-                        <div class="booking-data-row"><span>Email</span><strong><?= $escape($email) ?></strong></div>
-                        <div class="booking-data-row"><span>Nomor telepon</span><strong><?= $escape($phone) ?></strong></div>
-                        <div class="booking-data-row"><span>Metode pembayaran</span><strong><?= $paymentMethod === 'bank_transfer' ? 'Transfer bank' : 'Bayar di hotel' ?></strong></div>
-                        <div class="booking-data-row"><span>Kamar</span><strong><?= $escape($room['name']) ?></strong></div>
-                        <div class="booking-data-row"><span>Tanggal menginap</span><strong><?= $checkInDate->format('d/m/Y') ?> — <?= $checkOutDate->format('d/m/Y') ?></strong></div>
-                        <div class="booking-data-row"><span>Durasi & tamu</span><strong><?= $nights ?> malam · <?= $guestCount ?> tamu</strong></div>
-                        <div class="booking-total-row"><span>Total pembayaran</span><strong>Rp <?= number_format($totalPrice, 0, ',', '.') ?></strong></div>
-                        <a class="text-link mt-4" href="rooms.php">Jelajahi kamar lainnya <i class="bi bi-arrow-up-right"></i></a>
-                    </section>
-                <?php else: ?>
                     <div class="row g-4 booking-layout">
                         <div class="col-lg-7">
                             <section class="booking-form-card" aria-labelledby="booking-form-title">
@@ -273,34 +204,24 @@ $escape = static function ($value) {
                                 <h2 class="booking-section-title" id="booking-form-title">Data pemesan</h2>
                                 <p class="booking-section-copy">Lengkapi informasi berikut untuk melanjutkan permintaan pemesanan kamar.</p>
 
-                                <?php if ($errors): ?>
-                                    <div class="booking-error-list" role="alert">
-                                        <ul>
-                                            <?php foreach ($errors as $error): ?>
-                                                <li><?= $escape($error) ?></li>
-                                            <?php endforeach; ?>
-                                        </ul>
-                                    </div>
-                                <?php endif; ?>
-
                                 <form action="booking.php" method="post">
                                     <input type="hidden" name="room_id" value="<?= $roomId ?>">
-                                    <input type="hidden" name="check_in" value="<?= $escape($checkIn) ?>">
-                                    <input type="hidden" name="check_out" value="<?= $escape($checkOut) ?>">
+                                    <input type="hidden" name="check_in" value="<?= htmlspecialchars($checkIn, ENT_QUOTES, 'UTF-8') ?>">
+                                    <input type="hidden" name="check_out" value="<?= htmlspecialchars($checkOut, ENT_QUOTES, 'UTF-8') ?>">
                                     <input type="hidden" name="guests" value="<?= $guestCount ?>">
 
                                     <div class="mb-3">
                                         <label class="form-label booking-form-label" for="full-name">NAMA LENGKAP</label>
-                                        <input class="form-control booking-form-control" id="full-name" name="full_name" type="text" maxlength="120" autocomplete="name" value="<?= $escape($fullName) ?>" required>
+                                        <input class="form-control booking-form-control" id="full-name" name="full_name" type="text" maxlength="120" autocomplete="name" value="<?= htmlspecialchars($fullName, ENT_QUOTES, 'UTF-8') ?>" required>
                                     </div>
                                     <div class="row g-3">
                                         <div class="col-md-6">
                                             <label class="form-label booking-form-label" for="email">EMAIL</label>
-                                            <input class="form-control booking-form-control" id="email" name="email" type="email" maxlength="254" autocomplete="email" value="<?= $escape($email) ?>" required>
+                                            <input class="form-control booking-form-control" id="email" name="email" type="email" maxlength="254" autocomplete="email" value="<?= htmlspecialchars($email, ENT_QUOTES, 'UTF-8') ?>" required>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label booking-form-label" for="phone">NOMOR TELEPON</label>
-                                            <input class="form-control booking-form-control" id="phone" name="phone" type="tel" maxlength="24" pattern="[+0-9() .-]{8,24}" autocomplete="tel" value="<?= $escape($phone) ?>" required>
+                                            <input class="form-control booking-form-control" id="phone" name="phone" type="tel" maxlength="24" pattern="[+0-9() .-]{8,24}" autocomplete="tel" value="<?= htmlspecialchars($phone, ENT_QUOTES, 'UTF-8') ?>" required>
                                         </div>
                                     </div>
 
@@ -326,22 +247,23 @@ $escape = static function ($value) {
 
                         <div class="col-lg-5">
                             <aside class="booking-summary-card" aria-label="Ringkasan pemesanan">
-                                <img class="booking-room-image" src="<?= $escape($room['image']) ?>" alt="<?= $escape($room['name']) ?>" fetchpriority="high">
+                                <img class="booking-room-image" src="<?= htmlspecialchars($room['image'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($room['name'], ENT_QUOTES, 'UTF-8') ?>" fetchpriority="high">
                                 <div class="booking-summary-body">
-                                    <p class="booking-room-type"><?= $escape($room['type']) ?></p>
-                                    <h2 class="booking-room-name"><?= $escape($room['name']) ?></h2>
-                                    <div class="booking-data-row"><span>Check-in</span><strong><?= $checkInDate ? $checkInDate->format('d/m/Y') : $escape($checkIn) ?></strong></div>
-                                    <div class="booking-data-row"><span>Check-out</span><strong><?= $checkOutDate ? $checkOutDate->format('d/m/Y') : $escape($checkOut) ?></strong></div>
+                                    <p class="booking-room-type"><?= htmlspecialchars($room['type'], ENT_QUOTES, 'UTF-8') ?></p>
+                                    <h2 class="booking-room-name"><?= htmlspecialchars($room['name'], ENT_QUOTES, 'UTF-8') ?></h2>
+                                    <div class="booking-data-row"><span>Check-in</span><strong><?= $checkInTime !== false ? date('d/m/Y', $checkInTime) : '—' ?></strong></div>
+                                    <div class="booking-data-row"><span>Waktu check-in</span><strong>14.00 WITA</strong></div>
+                                    <div class="booking-data-row"><span>Check-out</span><strong><?= $checkOutTime !== false ? date('d/m/Y', $checkOutTime) : '—' ?></strong></div>
+                                    <div class="booking-data-row"><span>Waktu check-out</span><strong>12.00 WITA</strong></div>
                                     <div class="booking-data-row"><span>Jumlah malam</span><strong><?= $nights > 0 ? $nights : '—' ?></strong></div>
                                     <div class="booking-data-row"><span>Jumlah tamu</span><strong><?= $guestCount ?> orang</strong></div>
                                     <div class="booking-data-row"><span>Harga per malam</span><strong>Rp <?= number_format($room['price'], 0, ',', '.') ?></strong></div>
                                     <div class="booking-total-row"><span>Total harga</span><strong><?= $nights > 0 ? 'Rp ' . number_format($totalPrice, 0, ',', '.') : '—' ?></strong></div>
-                                    <a class="booking-change-link" href="<?= $escape($changeBookingUrl) ?>">Ubah tanggal atau jumlah tamu</a>
+                                    <a class="booking-change-link" href="room-detail.php?id=<?= $roomId ?>&amp;check_in=<?= urlencode($checkIn) ?>&amp;check_out=<?= urlencode($checkOut) ?>&amp;guests=<?= $guestCount ?>">Ubah tanggal atau jumlah tamu</a>
                                 </div>
                             </aside>
                         </div>
                     </div>
-                <?php endif; ?>
             </div>
         </main>
     <?php endif; ?>

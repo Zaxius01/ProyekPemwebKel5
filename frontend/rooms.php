@@ -2,11 +2,11 @@
 $rooms = [
     [
         'id' => 1,
-        'name' => 'Standard Room',
-        'type' => 'Standard Room',
+        'name' => 'Arunika Garden Suite',
+        'type' => 'SUITE · PEMANDANGAN TAMAN',
         'description' => 'Ruang nyaman bernuansa hangat untuk beristirahat setelah hari yang panjang.',
         'capacity' => 2,
-        'price' => 950000,
+        'price' => 1850000,
         'image' => 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=1000&q=85',
         'alt' => 'Kamar standard dengan tempat tidur nyaman dan interior hangat',
         'features' => ['Queen bed', 'Wi-Fi', 'Sarapan'],
@@ -14,11 +14,11 @@ $rooms = [
     ],
     [
         'id' => 2,
-        'name' => 'Deluxe Room',
-        'type' => 'Deluxe Room',
+        'name' => 'Serenity Ocean Room',
+        'type' => 'DELUXE · PEMANDANGAN LAUT',
         'description' => 'Kamar luas dengan sentuhan elegan dan fasilitas untuk pengalaman menginap istimewa.',
         'capacity' => 2,
-        'price' => 1450000,
+        'price' => 2450000,
         'image' => 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1000&q=85',
         'alt' => 'Kamar deluxe dengan desain modern dan tempat tidur king',
         'features' => ['King bed', 'Balkon', 'Bathtub'],
@@ -26,11 +26,11 @@ $rooms = [
     ],
     [
         'id' => 3,
-        'name' => 'Superior Room',
-        'type' => 'Superior Room',
+        'name' => 'The Arunika Residence',
+        'type' => 'VILLA · PRIVATE POOL',
         'description' => 'Pilihan tenang dengan desain kontemporer dan pemandangan taman tropis.',
         'capacity' => 2,
-        'price' => 1250000,
+        'price' => 4200000,
         'image' => 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1000&q=85',
         'alt' => 'Interior superior room dengan material alami dan warna netral',
         'features' => ['King bed', 'Pemandangan taman', 'Lounge'],
@@ -266,7 +266,7 @@ if ($sort === 'price_asc') {
                         <?php foreach ($filteredRooms as $room): ?>
                             <div class="col-md-6 col-lg-4">
                                 <article class="room-card">
-                                    <a class="room-image-wrap" href="room-detail.php?id=<?= $room['id'] ?>" aria-label="Lihat <?= htmlspecialchars($room['name'], ENT_QUOTES, 'UTF-8') ?>">
+                                    <a class="room-image-wrap" href="room-detail.php?id=<?= $room['id'] ?>&amp;check_in=<?= urlencode($checkIn) ?>&amp;check_out=<?= urlencode($checkOut) ?>&amp;guests=<?= $guests ?>" aria-label="Lihat <?= htmlspecialchars($room['name'], ENT_QUOTES, 'UTF-8') ?>">
                                         <img src="<?= htmlspecialchars($room['image'], ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($room['alt'], ENT_QUOTES, 'UTF-8') ?>" loading="lazy">
                                         <span class="room-tag">PILIHAN ARUNIKA</span>
                                     </a>
@@ -285,7 +285,7 @@ if ($sort === 'price_asc') {
                                         </div>
                                         <div class="room-card-bottom">
                                             <p><strong>Rp <?= number_format($room['price'], 0, ',', '.') ?></strong> <span>/ malam</span></p>
-                                            <a class="room-detail-link" href="room-detail.php?id=<?= $room['id'] ?>">Lihat Detail <i class="bi bi-arrow-up-right"></i></a>
+                                            <a class="room-detail-link" href="room-detail.php?id=<?= $room['id'] ?>&amp;check_in=<?= urlencode($checkIn) ?>&amp;check_out=<?= urlencode($checkOut) ?>&amp;guests=<?= $guests ?>">Lihat Detail <i class="bi bi-arrow-up-right"></i></a>
                                         </div>
                                     </div>
                                 </article>

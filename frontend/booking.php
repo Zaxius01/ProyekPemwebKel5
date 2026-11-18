@@ -1,4 +1,24 @@
 <?php
+session_start();
+require_once __DIR__ . '/includes/auth-flow.php';
+
+if (empty($_SESSION['user_id'])) {
+    $bookingUrl = arunikaBuildBookingUrl($_SERVER['REQUEST_METHOD'] === 'POST' ? $_POST : $_GET);
+    $_SESSION['pending_booking'] = arunikaNormalizeBookingData($_SERVER['REQUEST_METHOD'] === 'POST' ? $_POST : $_GET);
+    header('Location: login.php?redirect=' . rawurlencode($bookingUrl));
+    exit;
+}
+
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'customer') {
+    if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
+        header('Location: admin/dashboard.php');
+        exit;
+    }
+
+    http_response_code(403);
+    exit('Akses pemesanan hanya tersedia untuk akun customer.');
+}
+
 // Data kamar ini hanya untuk tampilan dan nantinya diganti dengan data dari backend.
 $rooms = [
     1 => [

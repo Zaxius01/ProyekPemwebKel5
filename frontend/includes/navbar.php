@@ -16,6 +16,7 @@
             </ul>
             <div class="navbar-actions">
                 <a class="nav-login" href="login.php">Masuk</a>
+                <a class="nav-login" href="register.php">Daftar</a>
                 <a class="btn btn-nav-book" href="rooms.php">Pesan sekarang <i class="bi bi-arrow-up-right"></i></a>
             </div>
         </div>

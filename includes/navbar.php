@@ -15,8 +15,13 @@
                 <li class="nav-item"><a class="nav-link" href="index.php#tentang">Tentang kami</a></li>
             </ul>
             <div class="navbar-actions">
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <span class="nav-login">Halo, <?= htmlspecialchars($_SESSION['full_name'], ENT_QUOTES, 'UTF-8') ?></span>
+                <a class="nav-login" href="logout.php">Logout</a>
+            <?php else: ?>
                 <a class="nav-login" href="login.php">Masuk</a>
-                <a class="nav-login" href="register.php">Daftar</a>
+                 <a class="nav-login" href="register.php">Daftar</a>
+            <?php endif; ?>
                 <a class="btn btn-nav-book" href="rooms.php">Pesan sekarang <i class="bi bi-arrow-up-right"></i></a>
             </div>
         </div>

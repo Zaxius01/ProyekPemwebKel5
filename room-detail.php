@@ -1,4 +1,5 @@
 <?php
+session_start();
 $rooms = [
     1 => [
         'name' => 'Arunika Garden Suite',

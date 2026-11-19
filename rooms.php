@@ -1,4 +1,5 @@
 <?php
+session_start();
 $rooms = [
     [
         'id' => 1,
